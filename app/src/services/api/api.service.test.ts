@@ -382,8 +382,9 @@ describe('ApiService', () => {
       fetchMock.mockResolvedValue(reply({ status: 1 }))
 
       await expect(api.toggleBookmark(10, 20)).resolves.toEqual({ status: 1 })
-      expect(calledUrls(fetchMock)[0]).toBe(`${host}/v1/bookmarks/toggle-item?item=10&folder=20&access_token=t`)
+      expect(calledUrls(fetchMock)[0]).toBe(`${host}/v1/bookmarks/toggle-item?access_token=t`)
       expect(lastInit(fetchMock)?.method).toBe('POST')
+      expect(String(lastInit(fetchMock)?.body)).toBe('item=10&folder=20')
     })
 
     it('search() searches titles, 36 per page, unsectioned', async () => {

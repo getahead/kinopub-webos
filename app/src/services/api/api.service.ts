@@ -275,8 +275,9 @@ export class ApiService {
     return this.get<{ folders: BookmarkFolder[] }>('/v1/bookmarks/get-item-folders', { item }, signal).then((r) => r.folders)
   }
 
+  /** Form fields, like the other bookmark writes: with the ids in the query the server answers «item not found». */
   toggleBookmark(item: number, folder: number) {
-    return this.post<{ status: number }>('/v1/bookmarks/toggle-item', { item, folder })
+    return this.request<{ status: number }>('/v1/bookmarks/toggle-item', {}, { method: 'POST', form: { item, folder } })
   }
 
   collections(page: number, signal?: AbortSignal) {
