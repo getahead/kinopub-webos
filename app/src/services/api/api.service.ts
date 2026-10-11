@@ -250,6 +250,15 @@ export class ApiService {
     return this.get<{ watching: boolean }>('/v1/watching/togglewatchlist', { id })
   }
 
+  /** Both folder calls are POST with form fields: unlike history, this endpoint ignores the query string. */
+  createBookmarkFolder(title: string) {
+    return this.request<{ folder: BookmarkFolder }>('/v1/bookmarks/create', {}, { method: 'POST', form: { title } }).then((r) => r.folder)
+  }
+
+  removeBookmarkFolder(folder: number) {
+    return this.request('/v1/bookmarks/remove-folder', {}, { method: 'POST', form: { folder } })
+  }
+
   /** Forgets every viewing of the item; a paused movie thereby leaves «Я смотрю». POST-only, but the id goes in the query. */
   clearHistory(id: number) {
     return this.request('/v1/history/clear-for-item', { id }, { method: 'POST' })

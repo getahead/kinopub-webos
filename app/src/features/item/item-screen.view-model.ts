@@ -31,9 +31,12 @@ export class ItemScreenViewModel {
   readonly toggleWatchlist: Mutation<{ watching: boolean }, void>
   readonly toggleWatched: Mutation<unknown, { video: number; season?: number }>
   readonly clearHistory: Mutation<unknown, void>
+  readonly createFolder: Mutation<BookmarkFolder, string>
 
   seasonIndex = 0
   bookmarksOpen = false
+  /** The «new folder» field inside the bookmarks sheet. */
+  newFolderOpen = false
 
   constructor(
     private readonly services: Services,
@@ -58,6 +61,7 @@ export class ItemScreenViewModel {
         toggleWatchlist: false,
         toggleWatched: false,
         clearHistory: false,
+        createFolder: false,
       },
       { autoBind: true },
     )
@@ -142,6 +146,19 @@ export class ItemScreenViewModel {
       onSuccess: () => {
         ui.showToast('Отметка просмотра изменена')
         void this.item.refetch()
+      },
+      onError: (error) => ui.showToast(error.message),
+    })
+    this.createFolder = new Mutation<BookmarkFolder, string>({
+      queryClient,
+      abortSignal: this.scope.signal,
+      mutationFn: (title) => api.createBookmarkFolder(title),
+      onSuccess: (folder) => {
+        this.newFolderOpen = false
+        this.folders.setData((folders) => [...(folders ?? []), folder])
+        void queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+        // The viewer came here to file this item: a fresh folder with it inside saves the second step.
+        this.toggleBookmark.mutate(folder).catch(() => {})
       },
       onError: (error) => ui.showToast(error.message),
     })
@@ -301,6 +318,15 @@ export class ItemScreenViewModel {
 
   closeBookmarks() {
     this.bookmarksOpen = false
+    this.newFolderOpen = false
+  }
+
+  openNewFolder() {
+    this.newFolderOpen = true
+  }
+
+  submitNewFolder(title: string) {
+    this.createFolder.mutate(title).catch(() => {}) // onError already reports it
   }
 
   removeFromWatching() {

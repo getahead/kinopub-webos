@@ -378,6 +378,21 @@ describe('ApiService', () => {
       expect(lastInit(fetchMock)?.body).toBeUndefined()
     })
 
+    it('bookmark folders are created and removed with form fields, not query params', async () => {
+      const created = { id: 7, title: 'Вечер', views: 0, count: 0, created: 0, updated: 0 }
+
+      fetchMock.mockResolvedValue(reply({ status: 200, folder: created }))
+      await expect(api.createBookmarkFolder('Вечер')).resolves.toEqual(created)
+      expect(calledUrls(fetchMock)[0]).toBe(`${host}/v1/bookmarks/create?access_token=t`)
+      expect(lastInit(fetchMock)?.method).toBe('POST')
+      expect(String(lastInit(fetchMock)?.body)).toBe('title=%D0%92%D0%B5%D1%87%D0%B5%D1%80')
+
+      fetchMock.mockResolvedValue(reply({ status: 200 }))
+      await api.removeBookmarkFolder(7)
+      expect(calledUrls(fetchMock)[1]).toBe(`${host}/v1/bookmarks/remove-folder?access_token=t`)
+      expect(String(lastInit(fetchMock)?.body)).toBe('folder=7')
+    })
+
     it('toggleBookmark() posts the item and folder', async () => {
       fetchMock.mockResolvedValue(reply({ status: 1 }))
 

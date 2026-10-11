@@ -2,3 +2,21 @@
   color: var(--mute);
   font-size: 24px;
 }
+
+/* An action among folders: dashed outline and muted text until focused, the plus instead of a check mark. */
+.new-folder {
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  border: 3px dashed var(--ash);
+  color: var(--mute);
+}
+
+.new-folder :global(svg) {
+  width: 28px;
+  height: 28px;
+}
+
+.new-folder :global(.is-focused),
+.new-folder:global(.is-focused) {
+  border-color: transparent;
+}

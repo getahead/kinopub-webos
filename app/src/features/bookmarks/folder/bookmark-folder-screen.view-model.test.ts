@@ -19,6 +19,46 @@ const page = (ids: number[], current: number, total: number) => ({
 })
 
 describe('BookmarkFolderScreenViewModel', () => {
+  it('asks before removing a folder with items, then removes it and goes back', async () => {
+    const services = fakeServices()
+    const back = vi.spyOn(services.router, 'back').mockReturnValue(true)
+    const invalidate = vi.spyOn(services.queryClient, 'invalidateQueries')
+
+    services.api.bookmarkFolderItems.mockResolvedValue(page([1, 2, 3], 1, 1))
+    services.api.removeBookmarkFolder.mockResolvedValue({})
+    const vm = new BookmarkFolderScreenViewModel(services, 3)
+
+    await vi.waitFor(() => expect(vm.list).toHaveLength(3))
+    vm.askRemove()
+    expect(vm.confirmOpen).toBe(true)
+    expect(services.api.removeBookmarkFolder).not.toHaveBeenCalled()
+    vm.cancelRemove()
+    expect(vm.confirmOpen).toBe(false)
+
+    vm.askRemove()
+    vm.confirmRemove()
+    await vi.waitFor(() => expect(services.ui.toast).toBe('Папка «Избранное» удалена'))
+    expect(services.api.removeBookmarkFolder).toHaveBeenCalledWith(3)
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['bookmarks'] })
+    expect(back).toHaveBeenCalledTimes(1)
+    vm.dispose()
+  })
+
+  it('removes an empty folder without asking', async () => {
+    const services = fakeServices()
+
+    vi.spyOn(services.router, 'back').mockReturnValue(true)
+    services.api.bookmarkFolderItems.mockResolvedValue({ ...page([], 1, 1), folder: { ...folder, count: 0 } })
+    services.api.removeBookmarkFolder.mockResolvedValue({})
+    const vm = new BookmarkFolderScreenViewModel(services, 3)
+
+    await vi.waitFor(() => expect(vm.folder).toBeDefined())
+    vm.askRemove()
+    expect(vm.confirmOpen).toBe(false)
+    await vi.waitFor(() => expect(services.api.removeBookmarkFolder).toHaveBeenCalledWith(3))
+    vm.dispose()
+  })
+
   it('takes the title from the first page and flattens items across pages', async () => {
     const services = fakeServices()
 

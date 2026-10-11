@@ -284,6 +284,28 @@ describe('ItemScreenViewModel', () => {
     vm.dispose()
   })
 
+  it('creates a folder from the sheet and files the item into it', async () => {
+    const created = { id: 9, title: 'Вечер', views: 0, count: 0, created: 0, updated: 0 }
+
+    services.api.bookmarkFolders.mockResolvedValue([])
+    services.api.itemBookmarkFolders.mockResolvedValue([])
+    services.api.createBookmarkFolder.mockResolvedValue(created)
+    services.api.toggleBookmark.mockResolvedValue({ status: 1 })
+    const vm = await load(movie())
+
+    vm.openBookmarks()
+    vm.openNewFolder()
+    expect(vm.newFolderOpen).toBe(true)
+    vm.submitNewFolder('Вечер')
+    await vi.waitFor(() => expect(services.api.toggleBookmark).toHaveBeenCalledWith(1, 9))
+    expect(services.api.createBookmarkFolder).toHaveBeenCalledWith('Вечер')
+    expect(vm.newFolderOpen).toBe(false)
+    expect(vm.folders.data).toEqual([created])
+    await vi.waitFor(() => expect(services.ui.toast).toBe('Добавлено в «Вечер»'))
+    vm.closeBookmarks()
+    vm.dispose()
+  })
+
   it('updates the watchlist flag and invalidates home and watching queries', async () => {
     services.api.toggleWatchlist.mockResolvedValue({ watching: true })
     const invalidate = vi.spyOn(services.queryClient, 'invalidateQueries')

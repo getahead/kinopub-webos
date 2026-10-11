@@ -17,7 +17,7 @@ export const BookmarksScreen = observer(function BookmarksScreen() {
       <PageTitle>Закладки</PageTitle>
       <Status loading={vm.folders.isLoading} error={vm.folders.error?.message} onRetry={() => vm.folders.refetch()} />
       {vm.folders.isSuccess && folders.length === 0 && (
-        <Empty>Папок с закладками пока нет. Их можно создать на сайте Кинопаба, а добавлять в них фильмы прямо отсюда.</Empty>
+        <Empty>Папок с закладками пока нет. Создайте первую на странице фильма через «В закладки».</Empty>
       )}
       <List focusKey="BM-folders">
         {folders.map((folder, index) => (

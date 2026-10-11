@@ -20,8 +20,10 @@ export function Sheet({ title, children, onClose, focusKey = 'SHEET', initialFoc
   useEffect(
     () =>
       remote.push((event) => {
-        // The sheet slides in from the right, so Left closes it like Back.
-        if (!RemoteService.isBack(event) && event.keyCode !== RemoteKey.Left) return false
+        // The sheet slides in from the right, so Left closes it like Back; inside a text field Left moves the caret.
+        const typing = (event.target as HTMLElement | null)?.tagName === 'INPUT'
+
+        if (!RemoteService.isBack(event) && (event.keyCode !== RemoteKey.Left || typing)) return false
 
         onClose()
 

@@ -79,6 +79,16 @@ export const IconCheck = (p: Props) => (
     <path d="m5 12.5 4.5 4.5L19 7.5" />
   </svg>
 )
+export const IconPlus = (p: Props) => (
+  <svg {...base(p)}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+)
+export const IconTrash = (p: Props) => (
+  <svg {...base(p)}>
+    <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" />
+  </svg>
+)
 export const IconStack = (p: Props) => (
   <svg {...base(p)}>
     <path d="m12 3 9 5-9 5-9-5z" />

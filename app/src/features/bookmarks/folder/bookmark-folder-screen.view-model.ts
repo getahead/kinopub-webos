@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import { InfiniteQuery } from 'mobx-tanstack-query'
+import { InfiniteQuery, Mutation } from 'mobx-tanstack-query'
 import type { BookmarkFolder, ItemShort, Pagination } from '@/services/api/api.types'
 import type { Services } from '@/services/services'
 import { Scope } from '@/shared/view-model/use-view-model'
@@ -10,9 +10,12 @@ type FolderPage = { folder: BookmarkFolder; items: ItemShort[]; pagination: Pagi
 export class BookmarkFolderScreenViewModel {
   private readonly scope = new Scope()
   readonly pages: InfiniteQuery<FolderPage, Error, number>
+  readonly remove: Mutation<unknown, void>
+  /** Deleting a folder with items asks first; an empty one goes straight away. */
+  confirmOpen = false
 
   constructor(
-    { api, queryClient }: Services,
+    { api, queryClient, ui, router }: Services,
     readonly id: number,
   ) {
     this.pages = new InfiniteQuery<FolderPage, Error, number>({
@@ -24,7 +27,26 @@ export class BookmarkFolderScreenViewModel {
       getNextPageParam: nextPage,
       staleTime: 0,
     })
-    makeAutoObservable<this, 'scope'>(this, { scope: false, id: false, pages: false }, { autoBind: true })
+    this.remove = new Mutation<unknown, void>({
+      queryClient,
+      abortSignal: this.scope.signal,
+      mutationFn: () => api.removeBookmarkFolder(id),
+      onSuccess: () => {
+        ui.showToast(`Папка «${this.title ?? ''}» удалена`)
+        void queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+        router.back()
+      },
+      onError: (error) => ui.showToast(error.message),
+    })
+    makeAutoObservable<this, 'scope' | 'services'>(
+      this,
+      { scope: false, services: false, id: false, pages: false, remove: false },
+      { autoBind: true },
+    )
+  }
+
+  get folder() {
+    return this.pages.data?.pages[0]?.folder
   }
 
   get title() {
@@ -33,6 +55,20 @@ export class BookmarkFolderScreenViewModel {
 
   get list(): ItemShort[] {
     return this.pages.data?.pages.flatMap((p) => p.items) ?? []
+  }
+
+  askRemove() {
+    if ((this.folder?.count ?? this.list.length) > 0) this.confirmOpen = true
+    else this.confirmRemove()
+  }
+
+  cancelRemove() {
+    this.confirmOpen = false
+  }
+
+  confirmRemove() {
+    this.confirmOpen = false
+    this.remove.mutate().catch(() => {}) // onError already reports it
   }
 
   loadMore() {

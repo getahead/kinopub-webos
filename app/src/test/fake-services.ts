@@ -47,6 +47,8 @@ const API_METHODS = [
   'bookmarkFolderItems',
   'itemBookmarkFolders',
   'toggleBookmark',
+  'createBookmarkFolder',
+  'removeBookmarkFolder',
   'collections',
   'collectionItems',
   'tvChannels',

@@ -1,0 +1,21 @@
+.wrap {
+  flex: none;
+}
+
+.input {
+  width: 100%;
+  height: 72px;
+  padding: 0 28px;
+  border: 4px solid var(--ash);
+  border-radius: 36px;
+  background: var(--black);
+  color: var(--paper);
+  font: inherit;
+  font-size: 28px;
+  outline: 0;
+  transition: border-color 120ms var(--ease);
+}
+
+.wrap:global(.is-focused) .input {
+  border-color: var(--amber);
+}
