@@ -27,6 +27,34 @@ describe('PageViewModel.reveal', () => {
   })
 })
 
+describe('PageViewModel.reveal near the end', () => {
+  const stack = { offsetHeight: 1500 } as HTMLElement
+  const row = (offsetTop: number) => ({ offsetTop, offsetHeight: 96, offsetParent: stack }) as unknown as HTMLElement
+
+  it('shows the whole tail of a plain page when the focused row is close to the bottom', () => {
+    const vm = new PageViewModel(120, 0, 1080, false)
+
+    vm.setStack(stack)
+    vm.reveal(row(1380))
+    expect(vm.offset).toBe(1500 + 60 - 1080)
+  })
+
+  it('keeps the minimal scroll for rows far from the end and the pinned rule on hero pages', () => {
+    const plain = new PageViewModel(120, 0, 1080, false)
+    const tall = { offsetHeight: 3000 } as HTMLElement
+
+    plain.setStack(tall)
+    plain.reveal({ offsetTop: 1100, offsetHeight: 96, offsetParent: tall } as unknown as HTMLElement)
+    expect(plain.offset).toBe(1100 + 96 + 60 - 1080)
+
+    const hero = new PageViewModel(120, 0, 770, true)
+
+    hero.setStack(stack)
+    hero.reveal(row(1380))
+    expect(hero.offset).toBe(1380 - 120)
+  })
+})
+
 describe('PageViewModel.scrollBy', () => {
   it('moves one fixed step per wheel notch regardless of the delta size', () => {
     const vm = page(5000)

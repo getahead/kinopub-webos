@@ -48,6 +48,7 @@ export class PageViewModel {
 
     const elementTop = offsetWithin(el, this.stack)
     const elementBottom = elementTop + el.offsetHeight + BOTTOM_PADDING
+    const stackBottom = this.stack.offsetHeight + BOTTOM_PADDING
     let next = this.offset
 
     // Anything that fits on the first screen scrolls to the very top, so titles and headers above it come back into view.
@@ -55,6 +56,8 @@ export class PageViewModel {
     else if (this.pinned) next = Math.max(0, elementTop - this.top)
     else if (elementTop - this.top < this.offset) next = Math.max(0, elementTop - this.top)
     else if (elementBottom > this.offset + this.viewport) next = Math.max(0, elementBottom - this.viewport)
+    // Near the end of a plain page, show the end: a version line or footer under the last row would otherwise stay cut off.
+    if (!this.pinned && next > 0 && stackBottom - elementBottom < this.viewport / 3) next = Math.max(next, stackBottom - this.viewport)
     if (next === this.offset) return
 
     this.gliding = this.glide.step()
