@@ -21,18 +21,16 @@ export interface PressableProps {
   onArrow?: (direction: string) => boolean
 }
 
+/**
+ * norigin registers a focusable once, on mount, and ignores a later change of its key. A list that re-keys its rows
+ * (an item removed, a virtualized cell reused) would keep Enter bound to the old row, so the node remounts per key.
+ */
+export const Pressable = memo(function Pressable(props: PressableProps) {
+  return <PressableNode key={props.focusKey ?? ''} {...props} />
+})
+
 /** The Magic Remote pointer takes focus on hover; mousemove rather than mouseenter, which fires before the pointer is marked as in use. */
-export const Pressable = memo(function Pressable({
-  children,
-  className,
-  style,
-  focusKey,
-  focusable = true,
-  onPress,
-  onFocus,
-  onBlur,
-  onArrow,
-}: PressableProps) {
+function PressableNode({ children, className, style, focusKey, focusable = true, onPress, onFocus, onBlur, onArrow }: PressableProps) {
   const { ui } = useServices()
   const { ref, focused, focusSelf } = useFocusable<object, HTMLDivElement>({
     focusKey,
@@ -54,4 +52,4 @@ export const Pressable = memo(function Pressable({
       {children}
     </div>
   )
-})
+}
