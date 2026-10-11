@@ -79,6 +79,7 @@ export class ItemScreenViewModel {
     // After `item` exists: `data` reads it, and a computed that threw once stays thrown while observed.
     this.scope.defer(reaction(() => this.data?.trailer?.url ?? '', ui.setTrailer, { fireImmediately: true }))
     this.scope.defer(ui.clearTrailer)
+
     this.similar = new Query<ItemShort[]>({
       queryClient,
       abortSignal: this.scope.signal,
@@ -105,6 +106,7 @@ export class ItemScreenViewModel {
       queryKey: ['bookmarks'],
       queryFn: ({ signal }) => api.bookmarkFolders(signal),
     })
+
     this.itemFolders = new Query<BookmarkFolder[]>({
       queryClient,
       abortSignal: this.scope.signal,
@@ -127,6 +129,7 @@ export class ItemScreenViewModel {
       },
       onError: (error) => ui.showToast(error.message),
     })
+
     this.toggleWatchlist = new Mutation<{ watching: boolean }, void>({
       queryClient,
       abortSignal: this.scope.signal,
@@ -139,6 +142,7 @@ export class ItemScreenViewModel {
       },
       onError: (error) => ui.showToast(error.message),
     })
+
     this.toggleWatched = new Mutation<unknown, { video: number; season?: number }>({
       queryClient,
       abortSignal: this.scope.signal,
@@ -149,6 +153,7 @@ export class ItemScreenViewModel {
       },
       onError: (error) => ui.showToast(error.message),
     })
+
     this.createFolder = new Mutation<BookmarkFolder, string>({
       queryClient,
       abortSignal: this.scope.signal,
@@ -162,6 +167,7 @@ export class ItemScreenViewModel {
       },
       onError: (error) => ui.showToast(error.message),
     })
+
     this.clearHistory = new Mutation<unknown, void>({
       queryClient,
       abortSignal: this.scope.signal,
@@ -255,7 +261,6 @@ export class ItemScreenViewModel {
     return parts
   }
 
-  /** The API returns directors and cast as comma-separated strings. */
   get people(): PersonEntry[] {
     const item = this.data
 
