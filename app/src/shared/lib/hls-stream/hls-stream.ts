@@ -99,7 +99,7 @@ export class HlsStream {
   }
 
   private get sortedVariants() {
-    return this.variants.toSorted((a, b) => QUALITY_ORDER.indexOf(a.quality) - QUALITY_ORDER.indexOf(b.quality))
+    return this.variants.slice().sort((a, b) => QUALITY_ORDER.indexOf(a.quality) - QUALITY_ORDER.indexOf(b.quality))
   }
 
   attach(element: HTMLVideoElement | null) {

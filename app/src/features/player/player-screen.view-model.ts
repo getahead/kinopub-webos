@@ -220,9 +220,9 @@ export class PlayerScreenViewModel {
   }
 
   get files(): VideoFile[] {
-    return (this.video?.files ?? []).toSorted(
-      (a, b) => QUALITY_ORDER.indexOf(a.quality as VideoQuality) - QUALITY_ORDER.indexOf(b.quality as VideoQuality),
-    )
+    return (this.video?.files ?? [])
+      .slice()
+      .sort((a, b) => QUALITY_ORDER.indexOf(a.quality as VideoQuality) - QUALITY_ORDER.indexOf(b.quality as VideoQuality))
   }
 
   get bestFile(): VideoFile | undefined {

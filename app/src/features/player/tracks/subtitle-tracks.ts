@@ -34,7 +34,8 @@ export class SubtitleTracks {
   static order(tracks: SubtitleKind[]): number[] {
     return tracks
       .map((track, index) => ({ track, index }))
-      .toSorted((a, b) => rank(a.track) - rank(b.track) || SubtitleTracks.label(a.track).localeCompare(SubtitleTracks.label(b.track), 'ru'))
+      .slice()
+      .sort((a, b) => rank(a.track) - rank(b.track) || SubtitleTracks.label(a.track).localeCompare(SubtitleTracks.label(b.track), 'ru'))
       .map(({ index }) => index)
   }
 
