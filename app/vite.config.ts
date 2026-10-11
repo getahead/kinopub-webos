@@ -30,7 +30,9 @@ export default defineConfig({
     modules: { localsConvention: 'camelCaseOnly' },
   },
   build: {
-    target: 'chrome120',
+    // webOS 22 (2022) ships Chromium 87: the oldest platform this build is meant to run on. Syntax is lowered
+    // to it; runtime APIs are kept to what 87 has (no toSorted, findLast, structuredClone, Array.at).
+    target: 'chrome87',
     modulePreload: false,
     cssCodeSplit: false,
     sourcemap: false,

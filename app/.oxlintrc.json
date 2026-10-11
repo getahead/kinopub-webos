@@ -88,7 +88,8 @@
           }
         ]
       }
-    ]
+    ],
+    "unicorn/no-array-sort": "off"
   },
   "ignorePatterns": ["dist", "node_modules", "webos"],
   "jsPlugins": ["@stylistic/eslint-plugin"]
