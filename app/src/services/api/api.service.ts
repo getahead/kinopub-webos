@@ -250,6 +250,11 @@ export class ApiService {
     return this.get<{ watching: boolean }>('/v1/watching/togglewatchlist', { id })
   }
 
+  /** Forgets every viewing of the item; a paused movie thereby leaves «Я смотрю». POST-only, but the id goes in the query. */
+  clearHistory(id: number) {
+    return this.request('/v1/history/clear-for-item', { id }, { method: 'POST' })
+  }
+
   history(page: number, signal?: AbortSignal) {
     return this.get<HistoryPage>('/v1/history', { page, perpage: PER_PAGE }, signal)
   }

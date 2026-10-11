@@ -42,6 +42,7 @@ const API_METHODS = [
   'toggleWatched',
   'toggleWatchlist',
   'history',
+  'clearHistory',
   'bookmarkFolders',
   'bookmarkFolderItems',
   'itemBookmarkFolders',

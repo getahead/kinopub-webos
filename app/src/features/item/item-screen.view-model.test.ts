@@ -315,6 +315,24 @@ describe('ItemScreenViewModel', () => {
     vm.dispose()
   })
 
+  it('removes a paused movie from «Я смотрю» by clearing its history', async () => {
+    const started = movie({ videos: [video(100, 1, 0, { watching: { status: 0, time: 1800 } })] })
+
+    services.api.item.mockResolvedValue(started)
+    services.api.clearHistory.mockResolvedValue({})
+    const invalidate = vi.spyOn(services.queryClient, 'invalidateQueries')
+    const vm = new ItemScreenViewModel(services, 1)
+
+    await vi.waitFor(() => expect(vm.movieInProgress).toBe(true))
+    vm.removeFromWatching()
+    await vi.waitFor(() => expect(services.ui.toast).toBe('Убрано из «Я смотрю»'))
+    expect(services.api.clearHistory).toHaveBeenCalledWith(1)
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['watching'] })
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['history'] })
+    expect(services.api.item).toHaveBeenCalledTimes(2)
+    vm.dispose()
+  })
+
   it('shows the error message as a toast when a mutation fails', async () => {
     services.api.toggleWatchlist.mockRejectedValue(new ApiError(500, 'Не удалось'))
     services.api.toggleBookmark.mockRejectedValue(new ApiError(500, 'Нет связи'))

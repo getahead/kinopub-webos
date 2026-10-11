@@ -30,6 +30,7 @@ export class ItemScreenViewModel {
   readonly toggleBookmark: Mutation<unknown, BookmarkFolder>
   readonly toggleWatchlist: Mutation<{ watching: boolean }, void>
   readonly toggleWatched: Mutation<unknown, { video: number; season?: number }>
+  readonly clearHistory: Mutation<unknown, void>
 
   seasonIndex = 0
   bookmarksOpen = false
@@ -56,6 +57,7 @@ export class ItemScreenViewModel {
         toggleBookmark: false,
         toggleWatchlist: false,
         toggleWatched: false,
+        clearHistory: false,
       },
       { autoBind: true },
     )
@@ -140,6 +142,19 @@ export class ItemScreenViewModel {
       onSuccess: () => {
         ui.showToast('Отметка просмотра изменена')
         void this.item.refetch()
+      },
+      onError: (error) => ui.showToast(error.message),
+    })
+    this.clearHistory = new Mutation<unknown, void>({
+      queryClient,
+      abortSignal: this.scope.signal,
+      mutationFn: () => api.clearHistory(id),
+      onSuccess: () => {
+        ui.showToast('Убрано из «Я смотрю»')
+        void this.item.refetch()
+        void queryClient.invalidateQueries({ queryKey: ['watching'] })
+        void queryClient.invalidateQueries({ queryKey: ['home', 'continue'] })
+        void queryClient.invalidateQueries({ queryKey: ['history'] })
       },
       onError: (error) => ui.showToast(error.message),
     })
@@ -242,6 +257,13 @@ export class ItemScreenViewModel {
     return !this.isSerial && this.data?.videos?.[0]?.watched === 1
   }
 
+  /** A movie started and not finished: the state that lists it under «Я смотрю». */
+  get movieInProgress() {
+    const video = this.data?.videos?.[0]
+
+    return !this.isSerial && !!video && video.watched !== 1 && (video.watching?.time ?? 0) > 0
+  }
+
   get inFolders(): number[] {
     return (this.itemFolders.data ?? []).map((f) => f.id)
   }
@@ -279,6 +301,10 @@ export class ItemScreenViewModel {
 
   closeBookmarks() {
     this.bookmarksOpen = false
+  }
+
+  removeFromWatching() {
+    this.clearHistory.mutate().catch(() => {}) // onError already reports it
   }
 
   markMovieWatched() {

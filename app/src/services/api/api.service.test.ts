@@ -368,6 +368,16 @@ describe('ApiService', () => {
       ])
     })
 
+    it('clearHistory() posts with the id in the query, which is where Kinopub reads it', async () => {
+      fetchMock.mockResolvedValue(reply(null))
+
+      await api.clearHistory(31)
+
+      expect(calledUrls(fetchMock)[0]).toBe(`${host}/v1/history/clear-for-item?id=31&access_token=t`)
+      expect(lastInit(fetchMock)?.method).toBe('POST')
+      expect(lastInit(fetchMock)?.body).toBeUndefined()
+    })
+
     it('toggleBookmark() posts the item and folder', async () => {
       fetchMock.mockResolvedValue(reply({ status: 1 }))
 

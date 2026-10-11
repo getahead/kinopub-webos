@@ -4,7 +4,7 @@ import type { ItemShort } from '@/services/api/api.types'
 import { qualityBadge } from '@/shared/lib/format'
 import { Button } from '@/shared/ui/button'
 import { FocusGroup } from '@/shared/ui/focus'
-import { IconBookmark, IconBookmarkFilled, IconCheck, IconEye, IconFilm, IconPlay } from '@/shared/ui/icons'
+import { IconBookmark, IconBookmarkFilled, IconCheck, IconEye, IconFilm, IconHistory, IconPlay } from '@/shared/ui/icons'
 import { ItemsRow } from '@/shared/ui/items-row'
 import { Page } from '@/shared/ui/page'
 import { Plot } from '@/shared/ui/plot'
@@ -88,6 +88,11 @@ const ItemContent = observer(function ItemContent() {
             {vm.movieWatched ? 'Просмотрено' : 'Отметить просмотренным'}
           </Button>
         ) : null}
+        {vm.movieInProgress && (
+          <Button icon={<IconHistory />} onPress={vm.removeFromWatching}>
+            Убрать из «Я смотрю»
+          </Button>
+        )}
       </FocusGroup>
 
       {vm.isSerial && (
