@@ -16,20 +16,14 @@ export interface PlotProps {
   className?: string
 }
 
-/** A clamped description; when it doesn't fit, it becomes focusable and opens the full text. */
+/** A focusable description that opens the full text; when clamped it also shows a «Подробнее» hint. */
 export const Plot = observer(function Plot({ text, title, focusKey, className }: PlotProps) {
   const vm = useViewModel(() => new PlotViewModel())
   const page = useOptionalPage()?.page
 
   return (
     <>
-      <Pressable
-        focusKey={focusKey}
-        focusable={vm.truncated}
-        className={cx(styles.plot, className)}
-        onPress={vm.show}
-        onFocus={({ node }) => page?.reveal(node)}
-      >
+      <Pressable focusKey={focusKey} className={cx(styles.plot, className)} onPress={vm.show} onFocus={({ node }) => page?.reveal(node)}>
         <p ref={vm.setNode} className={styles.plotText}>
           {text}
         </p>

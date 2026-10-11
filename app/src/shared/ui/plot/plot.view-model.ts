@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 
 export class PlotViewModel {
-  /** Only a clamped plot is focusable: there is nothing more to read otherwise. */
+  /** Clamped: the «Подробнее» hint shows. The dialog opens either way, so a short plot still reads comfortably. */
   truncated = false
   open = false
 
@@ -29,7 +29,7 @@ export class PlotViewModel {
   }
 
   show() {
-    if (this.truncated) this.open = true
+    this.open = true
   }
 
   hide() {
