@@ -367,6 +367,19 @@ describe('PlayerScreenViewModel', () => {
       expect(vm.seekPreview).toBeNull()
     })
 
+    it('seekToFraction jumps to the clicked share of the video and clamps', async () => {
+      const { vm, el } = await setup()
+
+      el.currentTime = 100
+      el.duration = 2400
+      vm.seekToFraction(0.5)
+      expect(vm.seekPreview).toBe(1200)
+      vm.seekToFraction(2)
+      expect(vm.seekPreview).toBe(2400)
+      vm.seekToFraction(-1)
+      expect(vm.seekPreview).toBe(0)
+    })
+
     it('accelerates while keys repeat and resets the step after the commit', async () => {
       const { vm, el } = await setup()
 
@@ -504,6 +517,20 @@ describe('PlayerScreenViewModel', () => {
       expect(vm.hudVisible).toBe(true)
 
       vi.advanceTimersByTime(1)
+      expect(vm.hudVisible).toBe(false)
+    })
+
+    it('pointer movement shows the HUD unless a panel, error or card owns the screen', async () => {
+      const { vm } = await setup()
+
+      vi.advanceTimersByTime(HUD_MS)
+      expect(vm.hudVisible).toBe(false)
+      vm.onPointerMove()
+      expect(vm.hudVisible).toBe(true)
+
+      vm.openPanel('tracks')
+      vi.advanceTimersByTime(HUD_MS * 10)
+      vm.onPointerMove()
       expect(vm.hudVisible).toBe(false)
     })
 

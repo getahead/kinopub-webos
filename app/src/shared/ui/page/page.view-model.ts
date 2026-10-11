@@ -2,6 +2,8 @@ import { makeAutoObservable } from 'mobx'
 import { GlideDetector } from '@/shared/ui/motion'
 
 const BOTTOM_PADDING = 60
+/** One Magic Remote wheel notch; the TV reports it as a 100px line step. */
+const WHEEL_STEP = 240
 
 export class PageViewModel {
   offset: number
@@ -18,11 +20,13 @@ export class PageViewModel {
     readonly viewport: number,
     /** Pin the focused row to the top of the viewport instead of scrolling minimally. */
     private readonly pinned: boolean,
+    /** Focus taken by the Magic Remote pointer must not scroll: the next card would slide under the cursor and take focus in turn. */
+    private readonly pointer: () => boolean = () => false,
   ) {
     this.offset = initialOffset
-    makeAutoObservable<this, 'stack' | 'top' | 'glide' | 'pinned'>(
+    makeAutoObservable<this, 'stack' | 'top' | 'glide' | 'pinned' | 'pointer'>(
       this,
-      { stack: false, top: false, glide: false, viewport: false, pinned: false, initialFocusPlaced: false },
+      { stack: false, top: false, glide: false, viewport: false, pinned: false, pointer: false, initialFocusPlaced: false },
       { autoBind: true },
     )
   }
@@ -40,7 +44,7 @@ export class PageViewModel {
   }
 
   reveal(el: HTMLElement | null) {
-    if (!el || !this.stack) return
+    if (!el || !this.stack || this.pointer()) return
 
     const elementTop = offsetWithin(el, this.stack)
     const elementBottom = elementTop + el.offsetHeight + BOTTOM_PADDING
@@ -54,6 +58,19 @@ export class PageViewModel {
     if (next === this.offset) return
 
     this.gliding = this.glide.step()
+    this.offset = next
+  }
+
+  /** Wheel on the Magic Remote: one notch moves the stack by a fixed step, bounded by the content. */
+  scrollBy(delta: number) {
+    if (!this.stack || delta === 0) return
+
+    const max = Math.max(0, this.stack.offsetHeight + BOTTOM_PADDING - this.viewport)
+    const next = Math.max(0, Math.min(max, this.offset + Math.sign(delta) * WHEEL_STEP))
+
+    if (next === this.offset) return
+
+    this.gliding = false
     this.offset = next
   }
 

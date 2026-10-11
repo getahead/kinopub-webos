@@ -145,6 +145,22 @@ describe('UiService', () => {
     })
   })
 
+  describe('pointer', () => {
+    it('follows webOS cursor announcements, mouse movement and keys', () => {
+      const ui = new UiService()
+
+      expect(ui.pointer).toBe(false)
+      document.dispatchEvent(new CustomEvent('cursorStateChange', { detail: { visibility: true } }))
+      expect(ui.pointer).toBe(true)
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }))
+      expect(ui.pointer).toBe(false)
+      document.dispatchEvent(new MouseEvent('mousemove'))
+      expect(ui.pointer).toBe(true)
+      document.dispatchEvent(new CustomEvent('cursorStateChange', { detail: { visibility: false } }))
+      expect(ui.pointer).toBe(false)
+    })
+  })
+
   describe('backdrop and trailer', () => {
     it('does not notify observers when set to the same value', () => {
       const ui = new UiService()

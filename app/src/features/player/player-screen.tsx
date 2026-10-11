@@ -74,7 +74,7 @@ const PlayerContent = observer(function PlayerContent() {
   }, [vm.nextUp.visible, vm.hudVisible, vm.hudTarget, vm.hasSource, vm.error, vm.panel])
 
   return (
-    <div className={cx(shell.player, (vm.hudVisible || vm.nextUp.visible) && styles.hudOpen)}>
+    <div className={cx(shell.player, (vm.hudVisible || vm.nextUp.visible) && styles.hudOpen)} onMouseMove={vm.onPointerMove}>
       {vm.hasSource && (
         // Fallback needs a fresh element: the old one is bound to hls.js's MediaSource.
         <video key={vm.fallback ? 'file' : 'stream'} ref={vm.attach} src={vm.src} autoPlay playsInline crossOrigin="anonymous">

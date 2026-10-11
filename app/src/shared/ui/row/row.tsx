@@ -22,10 +22,11 @@ export interface RowProps {
 export const Row = observer(function Row({ focusKey, title, count, item, renderItem, imageOf }: RowProps) {
   const { page, locationKey } = usePage()
   const vm = useViewModel(
-    ({ focusMemory, images }) =>
+    ({ focusMemory, images, ui }) =>
       new RowViewModel({
         images,
         imageOf,
+        pointer: () => ui.pointer,
         count,
         width: item.width,
         initialOffset: focusMemory.offset(locationKey, focusKey),
@@ -57,6 +58,9 @@ export const Row = observer(function Row({ focusKey, title, count, item, renderI
             ))}
           </div>
         </FocusGroup>
+        {/* Pointer scrolling: resting the cursor near either edge moves the row, as on Netflix. Outside the viewport: its clip-path would swallow the hover. */}
+        <div className={cx(styles.rowEdge, styles.rowEdgeLeft)} onMouseMove={() => vm.edgeHover(-1)} />
+        <div className={cx(styles.rowEdge, styles.rowEdgeRight)} onMouseMove={() => vm.edgeHover(1)} />
       </div>
     </RowItemFocusContext.Provider>
   )

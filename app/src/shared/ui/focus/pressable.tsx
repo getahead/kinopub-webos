@@ -1,6 +1,7 @@
 import { useFocusable } from '@noriginmedia/norigin-spatial-navigation'
 import { memo, type CSSProperties, type ReactNode } from 'react'
 import { cx } from '@/shared/lib/cx'
+import { useServices } from '@/services/services'
 
 /** Node only: coordinates are read lazily and only navigation needs them. */
 export interface FocusLayout {
@@ -20,7 +21,7 @@ export interface PressableProps {
   onArrow?: (direction: string) => boolean
 }
 
-/** The Magic Remote pointer takes focus on hover. */
+/** The Magic Remote pointer takes focus on hover; mousemove rather than mouseenter, which fires before the pointer is marked as in use. */
 export const Pressable = memo(function Pressable({
   children,
   className,
@@ -32,6 +33,7 @@ export const Pressable = memo(function Pressable({
   onBlur,
   onArrow,
 }: PressableProps) {
+  const { ui } = useServices()
   const { ref, focused, focusSelf } = useFocusable<object, HTMLDivElement>({
     focusKey,
     focusable,
@@ -42,7 +44,13 @@ export const Pressable = memo(function Pressable({
   })
 
   return (
-    <div ref={ref} className={cx(className, focused && 'is-focused')} style={style} onMouseEnter={focusSelf} onClick={onPress}>
+    <div
+      ref={ref}
+      className={cx(className, focused && 'is-focused')}
+      style={style}
+      onMouseMove={() => ui.pointer && !focused && focusSelf()}
+      onClick={onPress}
+    >
       {children}
     </div>
   )

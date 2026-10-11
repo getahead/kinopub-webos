@@ -29,3 +29,19 @@
   position: absolute;
   top: 0;
 }
+
+.row-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--gutter);
+  z-index: 3;
+}
+
+.row-edge-left {
+  left: 0;
+}
+
+.row-edge-right {
+  right: 0;
+}

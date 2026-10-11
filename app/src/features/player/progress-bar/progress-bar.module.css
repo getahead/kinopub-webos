@@ -10,6 +10,16 @@
   position: relative;
   flex: 1;
   height: 6px;
+}
+
+/* Pointer hit area: the bar itself is 6px tall. */
+.bar::before {
+  content: '';
+  position: absolute;
+  inset: -24px 0;
+}
+
+.bar {
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.25);
   transition: height 120ms var(--ease);

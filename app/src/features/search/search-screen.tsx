@@ -18,7 +18,9 @@ export const SearchScreen = observer(function SearchScreen() {
         <SearchInput value={vm.query} onChange={vm.setQuery} resultsFocusKey={vm.list.length ? GRID_FOCUS_KEY : undefined} />
       </div>
       {!vm.results.isFetched && !vm.results.isFetching && (
-        <div className={styles.searchHint}>Нажмите ОК, чтобы открыть клавиатуру. Результаты появляются по мере ввода.</div>
+        <div className={styles.searchHint}>
+          Нажмите ОК, чтобы открыть клавиатуру, или микрофон на пульте, чтобы продиктовать. Результаты появляются по мере ввода.
+        </div>
       )}
       {vm.isEmptyResult && (
         <Empty>По запросу «{vm.normalized}» ничего не нашлось. Попробуйте другое написание или оригинальное название.</Empty>

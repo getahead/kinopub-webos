@@ -613,6 +613,22 @@ export class PlayerScreenViewModel {
     this.showHud()
   }
 
+  onPointerMove() {
+    if (this.panel || this.error || this.pauseScreen || this.nextUp.visible) return
+
+    this.showHud()
+  }
+
+  seekToFraction(fraction: number) {
+    const el = this.element
+
+    if (!el || !el.duration) return
+
+    const target = Math.max(0, Math.min(1, fraction)) * el.duration
+
+    this.seekBy(target - (this.seekPreview ?? el.currentTime))
+  }
+
   /** Left/right on the bar seek; down leaves the bar for the controls, other directions stay. */
   onBarArrow(direction: string): boolean {
     if (direction === 'left' || direction === 'right') {

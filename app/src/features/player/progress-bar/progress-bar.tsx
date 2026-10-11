@@ -13,7 +13,15 @@ interface ProgressBarProps {
 export const ProgressBar = observer(function ProgressBar({ vm, focusKey }: ProgressBarProps) {
   return (
     <Pressable focusKey={focusKey} className={styles.progress} onPress={vm.togglePlay} onArrow={vm.onBarArrow}>
-      <div className={styles.bar}>
+      <div
+        className={styles.bar}
+        onClick={(event) => {
+          event.stopPropagation()
+          const rect = event.currentTarget.getBoundingClientRect()
+
+          vm.seekToFraction((event.clientX - rect.left) / rect.width)
+        }}
+      >
         <div className={styles.barFill} style={{ width: `${vm.progress}%` }} />
         <div className={styles.barKnob} style={{ left: `${vm.progress}%` }}>
           <span className={styles.barTip}>{formatClock(vm.shownTime)}</span>

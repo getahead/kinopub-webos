@@ -12,6 +12,8 @@ export interface FocusedItem {
 
 export class UiService {
   backdrop = ''
+  /** Magic Remote pointer in use: hover may take focus. Keys turn it off so rows moving under a resting cursor don't steal focus back. */
+  pointer = false
   /** Trailer the current screen wants behind its hero; the backdrop plays it once focus is off the cards. */
   trailer = ''
   toast = ''
@@ -28,6 +30,16 @@ export class UiService {
       { toastTimer: false, focusTimer: false, blurTimer: false, lastFocusAt: false, focused: observable.ref },
       { autoBind: true },
     )
+    // webOS announces the pointer; movement and keys cover browsers and the pointer resting on the screen.
+    document.addEventListener('cursorStateChange', (event) =>
+      this.setPointer(!!(event as CustomEvent<{ visibility: boolean }>).detail?.visibility),
+    )
+    document.addEventListener('mousemove', () => this.setPointer(true), true)
+    window.addEventListener('keydown', () => this.setPointer(false), true)
+  }
+
+  setPointer(visible: boolean) {
+    if (visible !== this.pointer) this.pointer = visible
   }
 
   setPageFocusKey(key: string) {

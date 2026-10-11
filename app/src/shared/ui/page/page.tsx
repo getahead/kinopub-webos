@@ -49,6 +49,7 @@ export const Page = observer(function Page({
         focusMemory.offset(locationKey, PAGE_AREA),
         hero ? SCREEN_HEIGHT - HERO_HEIGHT : SCREEN_HEIGHT,
         hero,
+        () => ui.pointer,
       ),
   )
   const [context] = useState<PageContextValue>(() => ({ page: vm, locationKey, hero }))
@@ -96,7 +97,7 @@ export const Page = observer(function Page({
         className={cx(styles.page, hero && styles.pageWithHero, className)}
       >
         {hero && <PageHero title={title} />}
-        <div className={styles.pageViewport}>
+        <div className={styles.pageViewport} onWheel={(event) => vm.scrollBy(event.deltaY)}>
           <div className={cx(styles.pageScroll, vm.gliding && styles.isGliding)} style={{ transform: `translateY(-${vm.offset}px)` }}>
             <div className={styles.pageStack} ref={vm.setStack}>
               {children}
