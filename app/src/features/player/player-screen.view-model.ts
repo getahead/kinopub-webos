@@ -51,6 +51,8 @@ const FLASH_MS = 700
 const PAUSE_SCREEN_MS = 8000
 /** Magic Remote OK in pointer mode may reach the app as both a click and an Enter key: one press, one toggle. */
 const OK_ECHO_MS = 300
+/** Past this share of the video, the device's «continue» point moves on to the next episode. */
+const FINISHED_SHARE = 0.95
 
 const FAILED_MESSAGE =
   'Видео не воспроизводится: не помогли ни смена качества, ни обновление ссылок, ни запасной способ. Проверьте интернет и попробуйте ещё раз.'
@@ -585,6 +587,7 @@ export class PlayerScreenViewModel {
   }
 
   private onEnded() {
+    this.rememberLocally(this.position, true)
     this.markWatched()
     if (this.isTrailer || !this.nextUp.onEnded()) {
       this.services.router.back()
@@ -900,6 +903,41 @@ export class PlayerScreenViewModel {
 
     this.lastMarkAt = Date.now()
     void this.services.api.markTime(this.params.itemId, el.currentTime, video.number, this.season || undefined).catch(() => {})
+    this.rememberLocally(this.position)
+  }
+
+  /** This TV's own history and «continue» point, on the device: the account's lists are shared by everyone using it. */
+  private rememberLocally(time: number, ended = false) {
+    const item = this.item.data
+    const video = this.video
+
+    if (!item || !video || this.isTrailer) return
+
+    const duration = this.duration || video.duration
+    const { localHistory } = this.services
+    const here = { item, videoId: video.id, season: this.season, episode: video.number, episodeTitle: video.title, duration }
+
+    // The element stays `ended` until playback restarts, so the report on leaving the screen agrees with `ended`.
+    if (ended || this.element?.ended || (duration && time >= duration * FINISHED_SHARE)) {
+      const next = this.next
+
+      if (!next) localHistory.remember({ ...here, time: duration, finished: true })
+      else {
+        localHistory.remember({
+          item,
+          videoId: next.video.id,
+          season: next.season,
+          episode: next.video.number,
+          episodeTitle: next.video.title,
+          time: 0,
+          duration: next.video.duration,
+        })
+      }
+
+      return
+    }
+
+    localHistory.remember({ ...here, time })
   }
 
   private onKey(event: KeyboardEvent): boolean {
