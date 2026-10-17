@@ -2,8 +2,12 @@
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 28px;
   padding: 16px 0;
+}
+
+/* Margins, not `gap`: webOS 6 (Chromium 79) has no flex gap. */
+.progress > :not(:first-child) {
+  margin-left: 28px;
 }
 
 .bar {
