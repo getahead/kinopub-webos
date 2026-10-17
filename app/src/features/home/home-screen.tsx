@@ -35,16 +35,13 @@ export const HomeScreen = observer(function HomeScreen() {
           key={shelf.key}
           focusKey={`ROW-${shelf.key}`}
           title={shelf.title}
-          items={shelf.query.data ?? []}
+          items={vm.itemsOf(shelf)}
           moreLink={shelf.moreLink}
           ranked={shelf.ranked}
-          progressOf={shelf.key === CONTINUE_SHELF_KEY ? continueProgress : undefined}
-          subtitleOf={shelf.key === CONTINUE_SHELF_KEY ? continueSubtitle : undefined}
+          progressOf={shelf.key === CONTINUE_SHELF_KEY ? vm.continueProgress : undefined}
+          subtitleOf={shelf.key === CONTINUE_SHELF_KEY ? vm.continueSubtitle : undefined}
         />
       ))}
     </Page>
   )
 })
-
-const continueProgress = (item: { total?: number; watched?: number }) => (item.total ? (item.watched ?? 0) / item.total : undefined)
-const continueSubtitle = (item: { new?: number }) => (item.new ? `${item.new} новых` : undefined)
