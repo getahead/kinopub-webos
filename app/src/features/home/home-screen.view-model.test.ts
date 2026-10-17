@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/services/api/api.service'
 import type { ItemShort } from '@/services/api/api.types'
 import { fakeServices, flush, type FakeServices } from '@/test/fake-services'
-import { CONTINUE_SHELF_KEY, HomeScreenViewModel } from './home-screen.view-model'
+import { CONTINUE_LOCAL_FOCUS_KEY, CONTINUE_SHELF_KEY, HomeScreenViewModel } from './home-screen.view-model'
 
 const item = (id: number): ItemShort => ({
   id,
@@ -19,6 +19,31 @@ describe('HomeScreenViewModel', () => {
 
   beforeEach(() => {
     services = fakeServices()
+  })
+
+  describe('continue from this TV', () => {
+    it('offers nothing and focuses the first shelf until something was played here', async () => {
+      services.api.watchingSerials.mockResolvedValue(items(2))
+      const vm = new HomeScreenViewModel(services)
+
+      await flush()
+      expect(vm.lastPlayed).toBeNull()
+      expect(vm.initialFocusKey).toBe(`ROW-${CONTINUE_SHELF_KEY}`)
+      vm.dispose()
+    })
+
+    it('focuses the button and resumes the device-local episode and position', () => {
+      const navigate = vi.spyOn(services.router, 'navigate').mockResolvedValue(undefined)
+
+      services.localHistory.remember({ item: item(7), videoId: 103, season: 1, episode: 3, episodeTitle: '', time: 3413.4, duration: 4120 })
+      const vm = new HomeScreenViewModel(services)
+
+      expect(vm.initialFocusKey).toBe(CONTINUE_LOCAL_FOCUS_KEY)
+
+      vm.continueLastPlayed()
+      expect(navigate).toHaveBeenCalledWith('/item/7/play/103?t=3413')
+      vm.dispose()
+    })
   })
 
   it('lays the shelves out in the fixed order with their titles and links', () => {

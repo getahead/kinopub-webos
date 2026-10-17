@@ -14,6 +14,7 @@ export interface HomeShelf {
 }
 
 export const CONTINUE_SHELF_KEY = 'continue'
+export const CONTINUE_LOCAL_FOCUS_KEY = 'HOME-continue-local'
 const TOP_COUNT = 10
 
 export class HomeScreenViewModel {
@@ -87,6 +88,21 @@ export class HomeScreenViewModel {
     const first = this.visibleShelves[0]
 
     return first ? `ROW-${first.key}` : undefined
+  }
+
+  /** What this TV was watching last, from the device: the shared account's watching list says what anyone played. */
+  get lastPlayed() {
+    return this.services.localHistory.resumable
+  }
+
+  get initialFocusKey() {
+    return this.lastPlayed ? CONTINUE_LOCAL_FOCUS_KEY : this.firstShelfFocusKey
+  }
+
+  continueLastPlayed() {
+    const last = this.lastPlayed
+
+    if (last) void this.services.router.navigate(link.player(last.item.id, last.videoId, { t: last.time }))
   }
 
   retry() {
