@@ -34,6 +34,14 @@
   }
 }
 
+/* The play/pause icon lines up with the title: the button's 16px inner offset is pulled into the gutter. */
+.player-timeline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 40px 0 0 -16px;
+}
+
 .player-controls {
   display: flex;
   gap: 8px;
